@@ -1,3 +1,4 @@
+fs = require 'fs'
 us = require 'user-startup'
 
 module.exports =
