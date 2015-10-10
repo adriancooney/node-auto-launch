@@ -1,36 +1,35 @@
-ini = require 'ini'
-fs = require 'fs'
-
-SYSTEMD_SERVICES_PATH = '/etc/systemd/system/'
+us = require 'user-startup'
 
 module.exports =
     # Create the service file
     enable: (opts, cb) ->
-        unit =
-            Unit:
-                Description: opts.appName
-            Service:
-                ExecStart: opts.appPath
-            Install:
-                WantedBy: 'multi-user.target'
+        id = @toID(opts.appName)
+        log = "#{us.getFile(id)}.log"
 
-        fs.writeFile @getServicePath(opts), ini.stringify(unit), cb
+        # To account for the odd API design, we need to create a log file
+        # for the startup command to output to.
+        fs.writeFile log, "", ->
+            # And create the log file (synchronous)
+            us.create id, opts.appPath, [], log
+
+            cb()
 
     # Check if the unit file exists
-    isEnabled: (opts, cb) -> fs.exists @getServicePath(opts), cb
+    isEnabled: (opts, cb) ->
+        return fs.exists us.getFile(@toID(opts.appName)), cb
 
     # Delete the unit file
-    disable: (opts, cb) -> fs.unlink @getServicePath(opts), cb
+    disable: (opts, cb) ->
+        id = @toID(opts.appName)
 
-    # Get the path to the systemd service
-    # return {string}
-    getServicePath: (opts) ->
-        return SYSTEMD_SERVICES_PATH + @toSlug(opts.appName) + '.service'
+        # The user-startup API (synchronous)
+        us.remove id
 
-    # Convert a string to a slug
-    # e.g. "Tommy's wonderlang" -> "tommys-wonderland"
-    # str - The {string} to slugify
-    # returns a {String}
-    toSlug: (str) ->
+        # Delete the log file
+        fs.unlink "#{id}.log", cb
+
+    # Hash an appName
+    # str - The apps {String} name
+    toID: (str) ->
         return str.replace /\s+/g, '-'
             .replace /[^a-z0-9_]/g, ''

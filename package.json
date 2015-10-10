@@ -37,7 +37,7 @@
   "homepage": "https://github.com/4ver/node-auto-launch",
   "dependencies": {
     "applescript": "^0.2.1",
-    "ini": "^1.3.4",
+    "user-startup": "^0.1.1",
     "winreg": "0.0.12"
   }
 }
