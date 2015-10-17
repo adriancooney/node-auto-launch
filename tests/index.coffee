@@ -2,7 +2,7 @@ chai = require 'chai'
 expect = chai.expect
 AutoLaunch = require '../src/'
 
-if process.platform is not 'win32'
+if process.platform isnt 'win32'
     autoLaunch = new AutoLaunch
         name: 'node-auto-launch test'
         path: '/bin/ls'

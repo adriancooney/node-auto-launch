@@ -27,7 +27,7 @@ module.exports =
         us.remove id
 
         # Delete the log file
-        fs.unlink "#{id}.log", cb
+        fs.unlink "#{us.getFile(id)}.log", cb
 
     # Hash an appName
     # str - The apps {String} name
